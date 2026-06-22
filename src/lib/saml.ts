@@ -64,7 +64,7 @@ function localName(tag: string): string {
 export function parseSaml(xml: string): DecodedSaml {
   const doc = new DOMParser().parseFromString(xml, "application/xml");
   const perr = doc.querySelector("parsererror");
-  if (perr) throw new SamlError("XML invalide : impossible de parser le document.");
+  if (perr) throw new SamlError("err.saml.invalid_xml");
 
   const root = doc.documentElement;
   const type = localName(root.nodeName);

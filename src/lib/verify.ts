@@ -1,4 +1,5 @@
 import { base64UrlToBytes, base64ToBytes, textToBytes } from "./base64";
+import { t, type Lang } from "./i18n";
 
 // Vérification de signature JWT via l'API Web Crypto native (aucune lib externe).
 
@@ -85,7 +86,7 @@ async function importKeyForAlg(
       ["sign"]
     );
   }
-  throw new Error(`Algorithme non pris en charge : ${alg}`);
+  throw new Error("err.alg.unsupported|" + alg);
 }
 
 async function importJwk(alg: string, jwk: JsonWebKey): Promise<CryptoKey> {
@@ -118,7 +119,7 @@ async function importJwk(alg: string, jwk: JsonWebKey): Promise<CryptoKey> {
       ["sign"]
     );
   }
-  throw new Error(`Algorithme non pris en charge : ${alg}`);
+  throw new Error("err.alg.unsupported|" + alg);
 }
 
 // JWKS: { keys: [ ... ] } — on choisit la clé par kid sinon la première compatible.
@@ -142,11 +143,12 @@ export async function verifyJwt(
   token: string,
   alg: string,
   keyMaterial: string,
-  kid?: string
+  kid?: string,
+  lang: Lang = "en"
 ): Promise<VerifyResult> {
   try {
     if (alg === "none") {
-      return { status: "error", message: "Algorithme « none » : aucune signature à vérifier." };
+      return { status: "error", message: t(lang, "err.alg.none") };
     }
     let material = keyMaterial.trim();
     if (material.startsWith("{") && material.includes('"keys"')) {
@@ -178,7 +180,11 @@ export async function verifyJwt(
     );
     return ok ? { status: "valid", alg } : { status: "invalid", alg };
   } catch (e) {
-    return { status: "error", message: (e as Error).message };
+    const msg = (e as Error).message;
+    if (msg.startsWith("err.alg.unsupported|")) {
+      return { status: "error", message: t(lang, "err.alg.unsupported", { alg: msg.split("|")[1] }) };
+    }
+    return { status: "error", message: msg };
   }
 }
 

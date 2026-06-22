@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import { TokenInput } from "../components/TokenInput";
 import { SignaturePanel } from "../components/SignaturePanel";
 import { decodeJwt, validateClaims, JwtError } from "../lib/jwt";
 import { renderJson } from "../lib/highlight";
+import { useLang } from "../lib/i18n";
 
 interface Props {
   token: string;
@@ -13,37 +13,39 @@ const SAMPLE =
   "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImFiYzEyMyJ9.eyJpc3MiOiJodHRwczovL2lkcC5hY21lLmNvbSIsInN1YiI6InVzZXItNDIiLCJhdWQiOiJ3ZWItYXBwIiwibmFtZSI6IkphbmUgRG9lIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSIsImlhdCI6MTcxODk5MjAwMCwiZXhwIjo5OTk5OTk5OTk5fQ.signature-placeholder";
 
 export function JwtView({ token, onToken }: Props) {
+  const { lang, t } = useLang();
+
   const decoded = useMemo(() => {
     if (!token.trim()) return null;
     try {
-      return { value: decodeJwt(token), error: null as string | null };
+      return { value: decodeJwt(token), errorKey: null as string | null };
     } catch (e) {
-      return { value: null, error: e instanceof JwtError ? e.message : "Erreur de décodage." };
+      return { value: null, errorKey: e instanceof JwtError ? e.message : "err.jwt.format" };
     }
   }, [token]);
 
   const validations = useMemo(
-    () => (decoded?.value ? validateClaims(decoded.value.payload) : []),
-    [decoded]
+    () => (decoded?.value ? validateClaims(decoded.value.payload, Date.now(), lang) : []),
+    [decoded, lang]
   );
 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 6 }}>
-        <label className="field-label" style={{ margin: 0 }}>Jeton JWT encodé</label>
-        <button className="btn ghost" onClick={() => onToken(SAMPLE)}>Charger un exemple</button>
+        <label className="field-label" style={{ margin: 0 }}>{t("jwt.inputLabel")}</label>
+        <button className="btn ghost" onClick={() => onToken(SAMPLE)}>{t("common.loadExample")}</button>
       </div>
-      <TokenInput label="" value={token} onChange={onToken} rows={4}
-        placeholder="Collez votre JWT (eyJ...)" />
+      <textarea className="token" value={token} spellCheck={false} rows={4}
+        placeholder={t("jwt.placeholder")} onChange={(e) => onToken(e.target.value)} style={{ minHeight: 88 }} />
 
-      {decoded?.error && <div className="error-box" style={{ marginTop: 14 }}>{decoded.error}</div>}
+      {decoded?.errorKey && <div className="error-box" style={{ marginTop: 14 }}>{t(decoded.errorKey)}</div>}
 
       {decoded?.value && (
         <div className="grid2" style={{ marginTop: 16 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div className="card">
-              <div className="card-head"><h3>Header</h3></div>
-              {renderJson(decoded.value.header)}
+              <div className="card-head"><h3>{t("jwt.header")}</h3></div>
+              {renderJson(decoded.value.header, lang)}
             </div>
             <SignaturePanel
               token={token}
@@ -53,8 +55,8 @@ export function JwtView({ token, onToken }: Props) {
           </div>
 
           <div className="card">
-            <div className="card-head"><h3>Payload</h3></div>
-            {renderJson(decoded.value.payload)}
+            <div className="card-head"><h3>{t("jwt.payload")}</h3></div>
+            {renderJson(decoded.value.payload, lang)}
             {validations.length > 0 && (
               <div className="badges">
                 {validations.map((v) => (

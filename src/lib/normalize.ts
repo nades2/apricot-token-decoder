@@ -52,6 +52,6 @@ export function normalizeToken(input: string): NormalizeResult {
 
   return {
     value: null,
-    error: "Format non reconnu : collez un JWT (eyJ…) ou une assertion SAML (XML ou base64).",
+    error: "err.format.unknown",
   };
 }

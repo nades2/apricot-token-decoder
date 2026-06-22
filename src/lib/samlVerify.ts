@@ -1,5 +1,6 @@
 import { canonicalize } from "./c14n";
 import { base64ToBytes } from "./base64";
+import { t, type Lang } from "./i18n";
 
 // Vérification de signature XML-DSig (RSA-SHA256 / ECDSA, enveloppée) pour SAML.
 // Best-effort : canonicalisation inclusive C14N 1.0. Couvre la majorité des assertions.
@@ -36,24 +37,25 @@ function pemFromCert(b64: string): ArrayBuffer {
 
 export async function verifySamlSignature(
   xml: string,
-  certBase64?: string
+  certBase64?: string,
+  lang: Lang = "en"
 ): Promise<SamlVerifyResult> {
   try {
     const doc = new DOMParser().parseFromString(xml, "application/xml");
     if (doc.querySelector("parsererror")) {
-      return { status: "error", message: "XML invalide." };
+      return { status: "error", message: t(lang, "err.saml.invalid_xml") };
     }
     const sig = doc.getElementsByTagNameNS(DSIG, "Signature")[0];
-    if (!sig) return { status: "error", message: "Aucune signature XML-DSig trouvée." };
+    if (!sig) return { status: "error", message: t(lang, "err.saml.no_signature") };
 
     const signedInfo = el(sig, "SignedInfo");
-    if (!signedInfo) return { status: "error", message: "SignedInfo introuvable." };
+    if (!signedInfo) return { status: "error", message: t(lang, "err.saml.no_signedinfo") };
 
     const sigMethod =
       el(signedInfo, "SignatureMethod")?.getAttribute("Algorithm") || "";
     const sigParams = SIG_ALGS[sigMethod];
     if (!sigParams)
-      return { status: "error", message: `Algorithme de signature non géré : ${sigMethod}` };
+      return { status: "error", message: t(lang, "err.saml.unsupported_sig", { alg: sigMethod }) };
 
     // 1) Vérifier le digest de la référence
     const ref = el(signedInfo, "Reference");
@@ -81,7 +83,7 @@ export async function verifySamlSignature(
       return {
         status: "invalid",
         method: sigParams.hash,
-        reason: "Le digest de la référence ne correspond pas (contenu altéré ou C14N différente).",
+        reason: t(lang, "err.saml.digest"),
       };
     }
 
@@ -93,7 +95,7 @@ export async function verifySamlSignature(
     const cert =
       certBase64 ||
       sig.getElementsByTagNameNS(DSIG, "X509Certificate")[0]?.textContent?.trim();
-    if (!cert) return { status: "error", message: "Aucun certificat / clé publique fourni." };
+    if (!cert) return { status: "error", message: t(lang, "err.saml.no_cert") };
 
     const key = await crypto.subtle.importKey(
       "spki",
@@ -117,7 +119,7 @@ export async function verifySamlSignature(
     );
     return ok
       ? { status: "valid", method: sigParams.hash }
-      : { status: "invalid", method: sigParams.hash, reason: "Signature cryptographique invalide." };
+      : { status: "invalid", method: sigParams.hash, reason: t(lang, "err.saml.crypto") };
   } catch (e) {
     return { status: "error", message: (e as Error).message };
   }
