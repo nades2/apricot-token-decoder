@@ -1,0 +1,12 @@
+{
+  "name": "Apricot Token Decoder",
+  "short_name": "Apricot",
+  "description": "Décodeur JWT (OAuth2/OIDC) et SAML, 100% local.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#141312",
+  "theme_color": "#e8853a",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
