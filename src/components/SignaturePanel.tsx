@@ -33,7 +33,7 @@ export function SignaturePanel({ token, alg, kid }: Props) {
         spellCheck={false}
         onChange={(e) => { setKey(e.target.value); setResult(null); }}
         placeholder={isHmac ? t("sig.secretPlaceholder") : t("sig.keyPlaceholder")}
-        style={{ minHeight: 84 }}
+        style={{ minHeight: 100 }}
       />
       <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12 }}>
         <button className="btn primary" onClick={run} disabled={!key || busy}>

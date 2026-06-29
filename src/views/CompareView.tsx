@@ -39,15 +39,15 @@ export function CompareView({ tokenA, tokenB, onA, onB }: Props) {
       <div className="grid2">
         <div>
           <label className="field-label">{t("cmp.tokenA")}</label>
-          <textarea className="token" value={tokenA} spellCheck={false} rows={3}
-            placeholder={t("cmp.placeholder")} onChange={(e) => onA(e.target.value)} style={{ minHeight: 80 }} />
+          <textarea className="token" value={tokenA} spellCheck={false} rows={4}
+            placeholder={t("cmp.placeholder")} onChange={(e) => onA(e.target.value)} style={{ minHeight: 110 }} />
           <div className="badges">{typeBadge(a)}</div>
           {a.error && <div className="error-box" style={{ marginTop: 8 }}>{t(a.error)}</div>}
         </div>
         <div>
           <label className="field-label">{t("cmp.tokenB")}</label>
-          <textarea className="token" value={tokenB} spellCheck={false} rows={3}
-            placeholder={t("cmp.placeholder")} onChange={(e) => onB(e.target.value)} style={{ minHeight: 80 }} />
+          <textarea className="token" value={tokenB} spellCheck={false} rows={4}
+            placeholder={t("cmp.placeholder")} onChange={(e) => onB(e.target.value)} style={{ minHeight: 110 }} />
           <div className="badges">{typeBadge(b)}</div>
           {b.error && <div className="error-box" style={{ marginTop: 8 }}>{t(b.error)}</div>}
         </div>

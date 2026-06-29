@@ -35,8 +35,8 @@ export function JwtView({ token, onToken }: Props) {
         <label className="field-label" style={{ margin: 0 }}>{t("jwt.inputLabel")}</label>
         <button className="btn ghost" onClick={() => onToken(SAMPLE)}>{t("common.loadExample")}</button>
       </div>
-      <textarea className="token" value={token} spellCheck={false} rows={4}
-        placeholder={t("jwt.placeholder")} onChange={(e) => onToken(e.target.value)} style={{ minHeight: 88 }} />
+      <textarea className="token" value={token} spellCheck={false} rows={6}
+        placeholder={t("jwt.placeholder")} onChange={(e) => onToken(e.target.value)} style={{ minHeight: 130 }} />
 
       {decoded?.errorKey && <div className="error-box" style={{ marginTop: 14 }}>{t(decoded.errorKey)}</div>}
 

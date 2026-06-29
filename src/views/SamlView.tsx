@@ -64,8 +64,8 @@ export function SamlView({ input, onInput }: Props) {
         <label className="field-label" style={{ margin: 0 }}>{t("saml.inputLabel")}</label>
         <button className="btn ghost" onClick={() => onInput(SAMPLE)}>{t("common.loadExample")}</button>
       </div>
-      <textarea className="token" value={input} spellCheck={false} rows={5}
-        placeholder={t("saml.placeholder")} onChange={(e) => onInput(e.target.value)} style={{ minHeight: 110 }} />
+      <textarea className="token" value={input} spellCheck={false} rows={7}
+        placeholder={t("saml.placeholder")} onChange={(e) => onInput(e.target.value)} style={{ minHeight: 170 }} />
 
       {parsed?.errorKey && <div className="error-box" style={{ marginTop: 14 }}>{t(parsed.errorKey)}</div>}
 
@@ -109,7 +109,7 @@ export function SamlView({ input, onInput }: Props) {
                 <div className="card-head"><h3>{t("saml.verifyTitle")}</h3></div>
                 <label className="field-label">{t("saml.certLabel")}</label>
                 <textarea value={cert} spellCheck={false} onChange={(e) => { setCert(e.target.value); setSig(null); }}
-                  placeholder={t("saml.certPlaceholder")} style={{ minHeight: 70 }} />
+                  placeholder={t("saml.certPlaceholder")} style={{ minHeight: 90 }} />
                 <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 12 }}>
                   <button className="btn primary" onClick={verify} disabled={busy || !parsed.value.hasSignature}>
                     {busy ? t("sig.verifying") : t("saml.verifyBtn")}
